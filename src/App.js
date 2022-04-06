@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import "./App.css";
-import {justifiedLayout} from "justified-layout";
+import justifiedLayout from "justified-layout";
 import { getSections, getSegments } from "./api";
 
 const config = {
