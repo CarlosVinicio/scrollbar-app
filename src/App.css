@@ -22,3 +22,18 @@ body {
   position: absolute;
   background-color: grey;
 }
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.barra {
+  border: solid;
+  position: absolute;
+  z-index: 150;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: yellow;
+}

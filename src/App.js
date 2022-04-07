@@ -159,8 +159,9 @@ function App() {
   
 
   return (
-    <div >
+    <div className="container">
       <div id="grid" className="scrubbable-grid"></div>
+      <div className="barra">asd</div>
     </div>
   );
 }
