@@ -110,7 +110,7 @@ function App() {
     var geometry = justifiedLayout(sizes, config);
   
     // gets tiles for each box given by justified layout lib
-    var tiles = geometry.boxes.map(getTileHtml).join("\n");
+    var tiles = geometry.boxes.map((box, index) => getTileHtml(box, segment.images[index])).join("\n");
     
     return {
       html: `<div id="${segment.segmentId}" class="segment" style="width: ${config.containerWidth}px; height: ${geometry.containerHeight}px; top: ${top}px; left: 0px;">${tiles}</div>`,
@@ -119,9 +119,9 @@ function App() {
   }
   
   // generates Tile html
-  const getTileHtml = (box) => {
-    const url = 'https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg'
-    return `<img class="tile" src="${url}" style="width: ${box.width}px; height: ${box.height}px; left: ${box.left}px; top: ${box.top}px;" />`;
+  const getTileHtml = (box, image) => {
+    // const url = 'https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg'
+    return `<img class="tile" src="${image.url}" style="width: ${box.width}px; height: ${box.height}px; left: ${box.left}px; top: ${box.top}px;" />`;
   }
   
   // detaches section by removing childs of section div and keeping same height
