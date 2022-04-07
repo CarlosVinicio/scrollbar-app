@@ -4,25 +4,32 @@ import justifiedLayout from "justified-layout";
 import { getSections, getSegments } from "./api";
 
 const config = {
-  containerWidth: window.innerWidth,
+  containerWidth: window.innerWidth - 40,
   targetRowHeight: 150,
   segmentsMargin: 20,
   sectionMargin: 20,
 };
 
 function App() {
-
+  const [sections, setSections] = useState([]);
   let sectionStates = {};
+  var prevSectionEnd = config.sectionMargin;
 
   useEffect(() => {
     loadUi();
   }, []);
 
 
+  useEffect(() => {
+    document.querySelectorAll(".section").forEach(sectionObserver.observe.bind(sectionObserver));
+  }, [sections])
+  
+
   const loadUi = async() => {
     const sections = await getSections();
     if(sections){
-      populateGrid(document.getElementById("grid"), sections);
+      setSections(sections);
+      // populateGrid(document.getElementById("grid"), sections);
   
       // simulating directly jumping to random scroll position
       window.scrollTo({ top: 0 });
@@ -156,12 +163,39 @@ function App() {
   const sectionObserver = new IntersectionObserver(handleSectionIntersection, {
     rootMargin: "200px 0px"
   });
-  
+
+  const getGridData = (section) => {
+      sectionStates[section.sectionId] = {
+      ...section,
+      lastUpdateTime: -1,
+      height: estimateSectionHeight(section),
+      top: prevSectionEnd
+    };
+    prevSectionEnd += sectionStates[section.sectionId].height + config.sectionMargin;
+    return sectionStates
+  }
 
   return (
-    <div className="container">
-      <div id="grid" className="scrubbable-grid"></div>
-      <div className="barra">asd</div>
+    <div >
+      <div style={{ position: "relative", overflow: "auto", height: "100vh" }}>
+        {sections.map((section) => {
+          const sectionState = getGridData(section)
+          return (
+            <div id={section.sectionId} key={Math.random()}
+              className="section" 
+              style={{ 
+                width: `${config.containerWidth}px`, 
+                height: `${sectionState[section.sectionId].height}px`,
+                top: `${sectionState[section.sectionId].top}px`,
+                // left: "0px" 
+              }}  
+            >
+            </div>
+          )
+        })}
+      </div>
+      {/* Componente barra */}
+      <div className="barra">Barra</div>
     </div>
   );
 }

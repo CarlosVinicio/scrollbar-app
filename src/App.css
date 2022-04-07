@@ -1,14 +1,11 @@
 body {
   margin: 0;
-}
-
-.scrubbable-grid {
-  position: relative;
+  overflow: hidden;
 }
 
 .section {
   position: absolute;
-  contain: layout;
+  contain: size;
   background-color: grey;
 }
 
@@ -29,7 +26,6 @@ body {
 }
 
 .barra {
-  border: solid;
   position: absolute;
   z-index: 150;
   right: 0;
