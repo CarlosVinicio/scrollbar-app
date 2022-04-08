@@ -1,6 +1,9 @@
 body {
-  margin: 0;
-  overflow: hidden;
+  height: 100vh;
+}
+
+.App {
+  height: calc(100vh - 20px);
 }
 
 .section {
@@ -23,13 +26,4 @@ body {
 .container {
   display: flex;
   justify-content: space-between;
-}
-
-.barra {
-  position: absolute;
-  z-index: 150;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  background-color: yellow;
 }

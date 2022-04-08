@@ -17,6 +17,7 @@ export const getSections = () => {
         return {
           sectionId: section.sectionId,
           totalImages: section.totalImages,
+          datesHeader: section.header
         };
       });
       return sections
@@ -29,6 +30,6 @@ export function getSegments(sectionId) {
     .then((res) => res.json())
     .then(delay(50 + Math.random() * 500))
     .then((store) => {
-      return store.sections.find((section) => section.sectionId == sectionId).segments;
+      return store.sections.find((section) => section.sectionId === sectionId).segments;
     });
 }
