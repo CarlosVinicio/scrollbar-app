@@ -12,6 +12,7 @@ import { getSections, getSegments } from "./api";
 
 // scrollbar
 import ScrollBar from "./ScrollBar";
+import { Sections } from "./Section";
 
 const config = {
   containerWidth: window.innerWidth - 40,
@@ -22,7 +23,8 @@ const config = {
 
 function App() {
   const [sections, setSections] = useState([]);
-  let sectionStates = {};
+  const [sectionStates, setSectionStates] = useState([]);
+  // let sectionStates = {};
   var prevSectionEnd = config.sectionMargin;
 
   useEffect(() => {
@@ -35,13 +37,31 @@ function App() {
       .forEach(sectionObserver.observe.bind(sectionObserver));
   }, [sections]);
 
+
+  const initSectionStates = (sections) => {
+    let localStates = {};
+    sections.forEach((section) => {
+      localStates[section.sectionId] = {
+        ...section,
+        lastUpdateTime: -1,
+        height: estimateSectionHeight(section),
+        top: prevSectionEnd,
+      };
+      prevSectionEnd +=
+      localStates[section.sectionId].height + 20;
+    })
+    setSectionStates(localStates);
+  }
+
+  const updateSectionStates = ( currentSectionStates ) => {
+    
+  }
+
   const loadUi = async () => {
     const sections = await getSections();
     if (sections) {
       setSections(sections);
-      // populateGrid(document.getElementById("grid"), sections);
-
-      // simulating directly jumping to random scroll position
+      initSectionStates(sections);
       window.scrollTo({ top: 0 });
     }
   };
@@ -51,39 +71,6 @@ function App() {
     console.dir(e.target.scrollTop);
   };
 
-  // populates grid node with all detached sections
-  const populateGrid = (gridNode, sections) => {
-    var sectionsHtml = "";
-    var prevSectionEnd = config.sectionMargin;
-    for (const section of sections) {
-      sectionStates[section.sectionId] = {
-        ...section,
-        lastUpdateTime: -1,
-        height: estimateSectionHeight(section),
-        top: prevSectionEnd,
-      };
-
-      sectionsHtml += getDetachedSectionHtml(sectionStates[section.sectionId]);
-      prevSectionEnd +=
-        sectionStates[section.sectionId].height + config.sectionMargin;
-    }
-    gridNode.innerHTML = sectionsHtml;
-
-    // observe each section for intersection with viewport
-    gridNode
-      .querySelectorAll(".section")
-      .forEach(sectionObserver.observe.bind(sectionObserver));
-  };
-
-  // generates detached section html, detached section has estimated height and no segments loaded
-  const getDetachedSectionHtml = (sectionState) => {
-    return `<div id="${sectionState.sectionId}" class="section" style="width: ${config.containerWidth}px; height: ${sectionState.height}px; top: ${sectionState.top}px; left: 0px";"></div>`;
-  };
-
-  // estimates section height, taken from google photos blog
-  // Ideally we would use the average aspect ratio for the photoset, however assume
-  // a normal landscape aspect ratio of 3:2, then discount for the likelihood we
-  // will be scaling down and coalescing.
   const estimateSectionHeight = (section) => {
     const unwrappedWidth =
       (3 / 2) * section.totalImages * config.targetRowHeight * (7 / 10);
@@ -163,6 +150,8 @@ function App() {
 
   // handle when there is change for section intersecting viewport
   const handleSectionIntersection = (entries, observer) => {
+    let tempSectionsStates = {...tempSectionsStates};
+
     entries.forEach((entry) => {
       const sectionDiv = entry.target;
       sectionStates[sectionDiv.id].lastUpdateTime = entry.time;
@@ -189,43 +178,10 @@ function App() {
     rootMargin: "200px 0px",
   });
 
-  const getGridData = (section) => {
-    sectionStates[section.sectionId] = {
-      ...section,
-      lastUpdateTime: -1,
-      height: estimateSectionHeight(section),
-      top: prevSectionEnd,
-    };
-    prevSectionEnd +=
-      sectionStates[section.sectionId].height + config.sectionMargin;
-    return sectionStates;
-  };
-
   return (
-    <div className="App">
-      <ScrollBar>
-        <div
-          onScroll={handleScrollEvent}
-          style={{ position: "relative", overflow: "hidden", height: "100vh" }}
-        >
-          {sections.map((section) => {
-            const sectionState = getGridData(section);
-            return (
-              <div
-                id={section.sectionId}
-                key={Math.random()}
-                className="section"
-                style={{
-                  width: `${config.containerWidth}px`,
-                  height: `${sectionState[section.sectionId].height}px`,
-                  top: `${sectionState[section.sectionId].top}px`,
-                  // left: "0px"
-                }}
-              ></div>
-            );
-          })}
-        </div>
-      </ScrollBar>
+    <div className="contenedor">   
+      <Sections sections={sections} sectionStates={sectionStates} />
+      <ScrollBar sectionStates={sectionStates}/>
     </div>
   );
 }

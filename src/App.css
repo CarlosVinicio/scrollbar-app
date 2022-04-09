@@ -8,7 +8,7 @@ body {
 
 .section {
   position: absolute;
-  contain: size;
+  contain: layout;
   background-color: grey;
 }
 
@@ -26,4 +26,15 @@ body {
 .container {
   display: flex;
   justify-content: space-between;
+}
+
+.barra {
+  border: solid;
+  position: absolute;
+  z-index: 150;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: yellow;
+  width: 33PX;
 }
