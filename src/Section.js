@@ -2,21 +2,18 @@ import React, { useEffect } from "react";
 
 export const Sections = ({ sections, sectionStates}) => {
   
-  const estimateSectionHeight = (section) => {
-    const unwrappedWidth =
-      (3 / 2) * section.totalImages * 150 * (7 / 10);
-    const rows = Math.ceil(unwrappedWidth / window.innerWidth - 40);
-    const height = rows * 150;
-
-    return height;
-  };
-
-  const onChangeSectionStates = () => {
-
-  }
+  useEffect(() => {          
+    document.getElementById('scrolling').addEventListener('scroll', function() {
+      console.log(window.scrollY);
+    });
+  }, [ ])
+  
 
   return (
-    <div  style={{ position: "relative", overflow: "auto", height: "100vh" }}>
+    <div  style={{ position: "relative", overflow: "auto", height: "100vh" }} 
+    /* onScroll={prueba} */
+      id="scrolling"
+    >
       {sections.map((section, index) => {
         return (
           <div

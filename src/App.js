@@ -24,7 +24,6 @@ const config = {
 function App() {
   const [sections, setSections] = useState([]);
   const [sectionStates, setSectionStates] = useState([]);
-  // let sectionStates = {};
   var prevSectionEnd = config.sectionMargin;
 
   useEffect(() => {
@@ -66,11 +65,6 @@ function App() {
     }
   };
 
-  // handle scroll event
-  const handleScrollEvent = (e) => {
-    console.dir(e.target.scrollTop);
-  };
-
   const estimateSectionHeight = (section) => {
     const unwrappedWidth =
       (3 / 2) * section.totalImages * config.targetRowHeight * (7 / 10);
@@ -81,7 +75,7 @@ function App() {
   };
 
   // populates section with actual segments html
-  const populateSection = (sectionDiv, segments) => {
+  const populateSection = (sectionDiv, segments, tempSectionsStates) => {
     let sectionId = sectionDiv.id;
     let segmentsHtml = "";
     let prevSegmentEnd = config.segmentsMargin;
@@ -94,7 +88,7 @@ function App() {
     // add segments to section and calculate new height
     sectionDiv.innerHTML = segmentsHtml;
     const newSectionHeight = prevSegmentEnd;
-    const oldSectionHeight = sectionStates[sectionId].height;
+    const oldSectionHeight = tempSectionsStates[sectionId].height;
 
     // adjust all next section's top if height of this section was modified
     const heightDelta = newSectionHeight - oldSectionHeight;
@@ -102,23 +96,24 @@ function App() {
       return;
     }
 
-    sectionStates[sectionId].height = newSectionHeight;
+    tempSectionsStates[sectionId].height = newSectionHeight;
     sectionDiv.style.height = `${newSectionHeight}px`;
 
-    Object.keys(sectionStates).forEach((sectionToAdjustId) => {
+    Object.keys(tempSectionsStates).forEach((sectionToAdjustId) => {
       if (sectionToAdjustId >= sectionId) {
         return;
       }
 
-      sectionStates[sectionToAdjustId].top += heightDelta;
+      tempSectionsStates[sectionToAdjustId].top += heightDelta;
       const sectionToAdjustDiv = document.getElementById(sectionToAdjustId);
-      sectionToAdjustDiv.style.top = `${sectionStates[sectionToAdjustId].top}px`;
+      sectionToAdjustDiv.style.top = `${tempSectionsStates[sectionToAdjustId].top}px`;
     });
 
     // adjust scroll if user is scrolling upwords and we loaded some section above current scroll position
-    if (window.scrollY > sectionStates[sectionId].top) {
+    if (window.scrollY > tempSectionsStates[sectionId].top) {
       window.scrollBy(0, heightDelta);
     }
+    setSectionStates(tempSectionsStates)
   };
 
   // generates Segment html and height
@@ -150,23 +145,23 @@ function App() {
 
   // handle when there is change for section intersecting viewport
   const handleSectionIntersection = (entries, observer) => {
-    let tempSectionsStates = {...tempSectionsStates};
+    let tempSectionsStates = {...sectionStates};
 
     entries.forEach((entry) => {
       const sectionDiv = entry.target;
-      sectionStates[sectionDiv.id].lastUpdateTime = entry.time;
+      tempSectionsStates[sectionDiv.id].lastUpdateTime = entry.time;
 
       if (entry.isIntersecting) {
         getSegments(sectionDiv.id).then((segments) => {
           window.requestAnimationFrame(() => {
-            if (sectionStates[sectionDiv.id].lastUpdateTime === entry.time) {
-              populateSection(sectionDiv, segments);
+            if (tempSectionsStates[sectionDiv.id].lastUpdateTime === entry.time) {
+              populateSection(sectionDiv, segments, tempSectionsStates);
             }
           });
         });
       } else {
         window.requestAnimationFrame(() => {
-          if (sectionStates[sectionDiv.id].lastUpdateTime === entry.time) {
+          if (tempSectionsStates[sectionDiv.id].lastUpdateTime === entry.time) {
             detachSection(sectionDiv, entry.time);
           }
         });

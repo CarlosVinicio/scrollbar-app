@@ -5,19 +5,24 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import "./scrollBar.css";
 
 const ScrollBar = ({ sectionStates }) => {
-
-
-  useEffect(() => {
-    console.log(sectionStates);
-  }, [sectionStates])
-  
+  const mouse = (x) => {
+    console.log(x);
+  }
 
   return (
-    <div 
-      className="barra"
-      /* style={{ border: "solid", position: "absolute", top: 0, right: 0, bottom: 0, width: "20px" }} */
-    >
-
+    <div className="barra">
+      <div>-</div>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", height: "95%" }} >
+      {Object.keys(sectionStates).map((keySection, index) => {
+        const currentSection = sectionStates[keySection]
+        return (     
+          <div key={index}>
+          
+            <div onMouseEnter={() => mouse(currentSection)}>*</div>
+          </div>
+        );
+      })}
+       </div>
     </div>
   );
 };
